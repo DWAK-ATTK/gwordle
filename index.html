@@ -110,8 +110,8 @@
 			}
 
 			DIV.alphabet-cell.correct {
-				border: 2px solid #78d16b;
-				background-color: #78d16b;
+				border: 2px solid #78d16b !important;
+				background-color: #78d16b !important;
 			}
 
 			DIV.alphabet-cell.bad {
@@ -198,6 +198,7 @@
 					cellItem.classList.add('alphabet-cell');
 					cellItem.setAttribute('data-alphabet-cell-index', index);
 					cellItem.setAttribute('data-alphabet-cell-value', ALPHABET[index]);
+					cellItem.setAttribute('data-not-set', 'not-set');
 					
 					spanItem = document.createElement('span');
 					spanItem.innerHTML = `${ALPHABET[index]}`;
@@ -234,23 +235,28 @@ console.info(value);
 				var startCellIndex = guessIndex * width;
 				var correctCount = 0;
 
+				var guessStates = getStates(word, guessWord);
 				for (var index = 0; index < width; index++) {
 					var cellIndex = startCellIndex + index;
 					var cell = document.querySelector(`[data-cell-index="${cellIndex}"]`);
 					var guessLetter = guessWord[index];
 					var alphabetCell = document.querySelector(`[data-alphabet-cell-index="${ALPHABET.indexOf(guessLetter)}"]`);
+					if (null == alphabetCell) { continue; }
 					cell.children[0].innerHTML = guessLetter;
-					var state = getState(guessLetter, index);
+					//var state = getState(guessLetter, index);
+					var state = guessStates[index];
 					switch (state) {
 						case CORRECT:
 							cell.classList.add('correct');
 							alphabetCell.classList.add('correct');
+							alphabetCell.removeAttribute('data-not-set');
 							correctCount++;
 							break;
 
 						case OUT_OF_PLACE:
 							cell.classList.add('out-of-place');
 							alphabetCell.classList.add('correct');
+							alphabetCell.removeAttribute('data-not-set');
 							break;
 
 						default:
@@ -270,7 +276,7 @@ console.info(value);
 					document.querySelector('.input-panel').remove();
 					if (width == correctCount) {
 						//	YOU'S A WINNER!
-						alert("You win!");
+						//alert("You win!");
 					} else {
 						//	A LOOSER BE YOU
 						alert(`You lose.  The word was '${word}'`);
@@ -292,6 +298,35 @@ console.info(value);
 				}
 
 				return BAD;
+			}
+
+
+
+			function getStates(word, guess) {
+				var results = [];
+
+				for(var guessIndex = 0; guessIndex < word.length; guessIndex++) {
+					results[guessIndex] = BAD;
+				}
+
+				for(var guessIndex = 0; guessIndex < word.length; guessIndex++) {
+					if (guess[guessIndex] == word[guessIndex]) {
+						results[guessIndex] = CORRECT;
+					}
+				}
+
+				for(var guessIndex = 0; guessIndex < word.length; guessIndex++) {
+					if (CORRECT == results[guessIndex]) { continue; }
+
+					for(var wordIndex = guessIndex; wordIndex < word.length; wordIndex++) {
+						if (guess[guessIndex] == word[wordIndex] && BAD == results[wordIndex]) { 
+							results[guessIndex] = OUT_OF_PLACE; 
+							break;
+						}
+					}
+				}
+
+				return results;
 			}
 
 
