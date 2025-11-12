@@ -7,7 +7,12 @@
 		<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500&display=swap" rel="stylesheet">
 
 		<style>
-			BODY { 
+			:root {
+				--grid-width: 5;
+				--grid-height: 5;
+			}
+
+			BODY {
 				display:grid;
 				grid-template-columns: 150px 1fr;
 				grid-template-rows: 1fr;
@@ -16,8 +21,8 @@
 
 			.guess-grid {
 				display: grid;
-				grid-template-columns: repeat(5, 1fr);
-				grid-template-rows: repeat(5, 1fr);
+				grid-template-columns: repeat(var(--grid-width), 1fr);
+				grid-template-rows: repeat(var(--grid-height), 1fr);
 				grid-column-gap: 0px;
 				grid-row-gap: 0px;
 				align-items: center;
@@ -147,6 +152,11 @@
 		</div>
 	</div>
 		<script>
+			// Game configuration constants
+			const GRID_WIDTH   = 5;
+			const GRID_HEIGHT  = 5;
+
+			// Character and state constants
 			const ALPHABET     = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 			const BAD          = -1;
 			const CORRECT      =  0;
@@ -154,7 +164,7 @@
 
 			const GAME_RUNNING = 0;
 			const GAME_OVER    = 1;
-			
+
 			var gameState = GAME_RUNNING;
 
 
@@ -172,11 +182,9 @@
 			});
 
 			//	set up guess grid
-			var width = 5;
-			var height = 5;
 			var index = 0;
-			for (var y = 0; y < height; y++) {
-				for (var x = 0; x < width; x++) {
+			for (var y = 0; y < GRID_HEIGHT; y++) {
+				for (var x = 0; x < GRID_WIDTH; x++) {
 					cellItem = document.createElement('div');
 					cellItem.classList.add('cell');
 					cellItem.setAttribute('data-cell-index', index);
@@ -227,7 +235,7 @@
 console.info(value);
 				var button = document.querySelector('.guess-button');
 
-				if (width != length) {
+				if (GRID_WIDTH != length) {
 					button.setAttribute('disabled', true);
 				} else {
 					button.removeAttribute('disabled');
@@ -244,11 +252,11 @@ console.info(value);
 					document.querySelector('.guess-input').value = '';
 					return;
 				}
-				var startCellIndex = guessIndex * width;
+				var startCellIndex = guessIndex * GRID_WIDTH;
 				var correctCount = 0;
 
 				var guessStates = getStates(word, guessWord);
-				for (var index = 0; index < width; index++) {
+				for (var index = 0; index < GRID_WIDTH; index++) {
 					var cellIndex = startCellIndex + index;
 					var cell = document.querySelector(`[data-cell-index="${cellIndex}"]`);
 					var guessLetter = guessWord[index];
@@ -282,11 +290,11 @@ console.info(value);
 				document.querySelector('.guess-input').value = '';
 				guessInputValueChanged();
 
-				if (height == guessIndex || width == correctCount) {
+				if (GRID_HEIGHT == guessIndex || GRID_WIDTH == correctCount) {
 					//	GAME OVER MAN.
 					gameState = GAME_OVER;
 					document.querySelector('.input-panel').remove();
-					if (width == correctCount) {
+					if (GRID_WIDTH == correctCount) {
 						//	YOU'S A WINNER!
 						//alert("You win!");
 					} else {
